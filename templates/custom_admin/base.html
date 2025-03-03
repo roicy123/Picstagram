@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <div style="display: flex;">
+        <div style="width: 200px; background-color: #f4f4f4; padding: 10px;">
+            <h3>Admin Panel</h3>
+            <ul>
+                <li><a href="{% url 'custom_admin_dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'profile_list' %}">Profiles</a></li>
+                <li><a href="{% url 'comment_list' %}">Comments</a></li>
+                <li><a href="{% url 'message_list' %}">Messages</a></li>
+                <li><a href="{% url 'notification_list' %}">Notifications</a></li>
+                <li><a href="{% url 'likes_list' %}">Likes</a></li>
+                <li><a href="{% url 'follow_list' %}">Follows</a></li>
+                <li><a href="{% url 'reel_list' %}">Reels</a></li>
+            </ul>
+        </div>
+        <div style="flex: 1; padding: 10px;">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

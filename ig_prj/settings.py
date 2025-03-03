@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['instagram-clone-d.herokuapp.com', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,13 +47,21 @@ INSTALLED_APPS = [
     'comment',
     'directs',
     'notification',
+    'reels',
+    'custom_admin',
+    'crispy_bootstrap4',
+    'rest_framework',
+    'corsheaders',
+    'chatbot',
+    'stories',
+    'content_analyzer',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    
+    "django.middleware.locale.LocaleMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -150,3 +159,107 @@ LOGOUT_REDIRECT_URL = 'sign-in'
 LOGIN_URL = 'sign-in'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+JAZZMIN_SETTINGS = {
+    # Basic setup
+    "site_title": "Instagram Clone Admin",
+    "site_header": "Instagram Clone Dashboard",
+    "site_brand": "InstaClone",
+    "welcome_sign": "Welcome to InstaClone Admin Panel",
+    "copyright": "InstaClone © 2025",
+    "user_avatar": "profile.picture",  # Assuming your `Profile` model has a `picture` field
+
+    # Logo and branding
+    "site_logo": "C:/Users/roicy/Downloads/Instagram-Clone/static/assets2/images/logo.png",  # Add your logo here (place it in the static folder)
+    "site_icon": "your_app_name/images/favicon.ico",  # Add a favicon (optional)
+    "login_logo": "your_app_name/images/login_logo.png",  # Custom login page logo
+    "login_logo_dark": True,  # Optional dark-mode logo
+    "show_sidebar": True,
+    "navigation_expanded": False,  # Keep the navigation collapsed by default
+    "hide_apps": ["auth"],  # Optional: Hide irrelevant apps like `auth`
+    "hide_models": ["auth.Group"],  # Optional: Hide unnecessary models
+    "order_with_respect_to": ["auth", "comment", "profile"],
+
+    # UI Tweaks
+    "changeform_format": "single",  # Make form fields look more compact
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",  # Specific formatting for auth users
+    },
+    "language_chooser": True,
+
+    # Custom Links
+    "custom_links": {
+        "profile": [
+            {
+                "name": "View Profile Stats",
+                "url": "https://your-website.com/admin/profile/",
+                "icon": "fas fa-chart-bar",
+                "permissions": ["profile.view_profile"],
+            }
+        ],
+    },
+
+    # Icons for apps and models
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "comment.Comment": "fas fa-comments",
+        "post.Post": "fas fa-image",
+        "profile.Profile": "fas fa-user-circle",
+        "stream.Stream": "fas fa-video",
+        "reel.Reel": "fas fa-film",
+        "follow.Follow": "fas fa-user-plus",
+    },
+
+    # Top Menu Links
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "View Site", "url": "/", "new_window": True},
+        {
+            "model": "profile.profile",
+        },
+        {
+            "name": "Support",
+            "url": "https://your-support-url.com",
+            "new_window": True,
+        },
+    ],
+
+    # Sidebar Links
+    "usermenu_links": [
+        {"name": "Support", "url": "https://your-support-url.com", "new_window": True},
+        {"model": "auth.user"},
+    ],
+
+    # Theme Customization
+    "theme": "cerulean",  # Themes: 'cerulean', 'cosmo', 'cyborg', 'darkly', 'flatly', 'journal', etc.
+    "dark_mode_theme": "cyborg",  # Optional dark mode
+
+    # Analytics (Optional)
+    "show_google_analytics": True,
+    "google_analytics": "UA-XXXXX-Y",  # Replace with your Google Analytics tracking code
+}
+
+LANGUAGE_CODE = "en"  # Default language
+
+# Add the languages you want to support
+LANGUAGES = [
+    ("en", "English"),
+    ("es", "Spanish"),
+    ("fr", "French"),
+    # Add more languages as needed
+]
+
+# Optional: Configure translation files
+LOCALE_PATHS = [
+    BASE_DIR / "locale",  # Path where your translation files are stored
+]
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '041129roycy@gmail.com'
+EMAIL_HOST_PASSWORD = 'gmfq spqf ejcs rdix'

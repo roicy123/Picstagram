@@ -27,14 +27,14 @@
           {{form}}
           <button class="form-btn" type="submit">Log in</button>
           <!-- <a href="index.html" class="form-btn" type="submit">Log in</a> -->
-          <span class="has-separator">Or</span>
-          <a class="facebook-login" href="#">
-            <i class="fab fa-facebook-square"></i> Log in with Facebook
-          </a>
-          <a class="password-reset" href="#">Forgot password?</a>
-        </form>
         <div class="sign-up">
           Don't have an account? <a href="{% url 'sign-up' %}">Sign up</a>
+        </div>
+        <div class="forgot-password">
+          <a href="{% url 'password_reset' %}">Forgot password?</a>
+        </div>
+        <div class="forgot-password">
+          <a href="{% url 'custom_admin_login' %}">Admin</a>
         </div>
         <div class="get-the-app">
           <span>Get the app.</span>

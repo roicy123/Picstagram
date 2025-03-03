@@ -26,12 +26,12 @@
           <div class="logo">
             <h3 style="padding: 20px; font-size: 20px;">Edit Profile</h3>
           </div>
-          {{form.image}} <br>
-		  {{form.first_name}} <br>
-		  {{form.last_name}} <br>
-		  {{form.bio}} <br>
-		  {{form.location}} <br>
-		  {{form.url}} <br>
+          {{ form.image|as_crispy_field }} <br>
+		      {{ form.first_name|as_crispy_field }} <br>
+		      {{ form.last_name|as_crispy_field }} <br>
+		      {{ form.bio|as_crispy_field }} <br>
+		      {{ form.location|as_crispy_field }} <br>
+		      {{ form.url|as_crispy_field }} <br>
           <button class="form-btn" type="submit">Update Profile</button>
           <!-- <a href="index.html" class="form-btn" type="submit">Log in</a> -->
           
@@ -80,7 +80,7 @@
           </ul>
         </nav>
         <div class="copyright-notice">
-          &copy 2019 Instagram
+          &copy 2025 Instagram
         </div>
       </div>
     </footer>

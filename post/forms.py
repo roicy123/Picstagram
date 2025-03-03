@@ -1,5 +1,5 @@
 from django import forms
-from post.models import Post
+from post.models import Post, Likes, Follow
 
 
 class NewPostform(forms.ModelForm):
@@ -12,3 +12,21 @@ class NewPostform(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['picture', 'caption', 'tags']
+
+class LikeForm(forms.ModelForm):
+    class Meta:
+        model = Likes
+        fields = ['user', 'post']
+        widgets = {
+            'user': forms.Select(attrs={'class': 'form-control'}),
+            'post': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class FollowForm(forms.ModelForm):
+    class Meta:
+        model = Follow
+        fields = ['follower', 'following']
+        widgets = {
+            'follower': forms.Select(attrs={'class': 'form-control'}),
+            'following': forms.Select(attrs={'class': 'form-control'}),
+        }

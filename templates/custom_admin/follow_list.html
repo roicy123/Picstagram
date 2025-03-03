@@ -1,0 +1,46 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Follows</h1>
+    <a href="{% url 'follow_add' %}" class="btn btn-primary mb-3">Add New Follow</a>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Follower</th>
+                <th>Following</th>
+                <th>Date Created</th>
+                <!-- Add other fields from your Follow model as needed -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for follow in follows %}
+            <tr>
+                <td>{{ follow.id }}</td>
+                <td>{{ follow.follower }}</td>
+                <td>{{ follow.following }}</td>
+                <td>{{ follow.created_at }}</td>
+                <!-- Add other fields from your Follow model as needed -->
+                <td>
+                    <a href="{% url 'follow_edit' follow.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'follow_delete' follow.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No follow relationships available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!-- message_list.html -->
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Messages</h1>
+    <a href="{% url 'message_add' %}" class="btn btn-primary mb-3">Add New Message</a>
+    
+
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Content</th>
+                <th>Sender</th>
+                <th>Recipient</th>
+                <th>Date Sent</th>
+                <!-- Add other fields from your Message model as needed -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message_item in messages %}
+            <tr>
+                <td>{{ message_item.id }}</td>
+                <td>{{ message_item.content|truncatechars:50 }}</td>
+                <td>{{ message_item.sender }}</td>
+                <td>{{ message_item.recipient }}</td>
+                <td>{{ message_item.date_sent }}</td>
+                <!-- Add other fields from your Message model as needed -->
+                <td>
+                    <a href="{% url 'message_edit' message_item.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'message_delete' message_item.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No messages available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

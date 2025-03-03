@@ -1,0 +1,9 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+    <h2>Admin Dashboard</h2>
+    <p>Total Posts: {{ post_count }}</p>
+    <p>Total Users: {{ user_count }}</p>
+    <p>Total Comments: {{ comment_count }}</p>
+    <!-- Add charts here using a library like Chart.js -->
+{% endblock %}

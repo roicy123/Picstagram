@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="reels-container">
+    {% for reel in reels %}
+    <div class="reel">
+        <video class="reel-video" autoplay loop muted>
+            <source src="{{ reel.video.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="reel-overlay">
+            <div class="reel-info">
+                <p>Uploaded by: <strong>{{ reel.user.username }}</strong></p>
+                <h2>{{ reel.caption }}</h2>
+                <div class="reel-actions">
+                    <a href="{% url 'like-reel' reel.id %}" class="like-btn">
+                        ❤️ {{ reel.likes.count }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    /* General Styles */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #111;
+        color: #fff;
+    }
+
+    .reels-container {
+        display: flex;
+        flex-direction: column;
+        overflow-y: scroll;
+        height: 100vh;
+        scroll-snap-type: y mandatory;
+        scrollbar-width: none; /* For Firefox */
+        -ms-overflow-style: none; /* For IE and Edge */
+    }
+
+    .reels-container::-webkit-scrollbar {
+        display: none; /* For Chrome, Safari, and Opera */
+    }
+
+    .reel {
+        position: relative;
+        height: 100vh;
+        display: flex;
+        justify-content: center; /* Center video horizontally */
+        align-items: center; /* Center video vertically */
+        scroll-snap-align: start;
+    }
+
+    .reel-video {
+        width: 40%; /* Reduce video width */
+        height: 80%; /* Maintain aspect ratio */
+        max-height: 90%; /* Ensure it doesn't exceed container height */
+        object-fit: cover;
+        filter: brightness(0.8);
+        transition: filter 0.3s ease-in-out;
+        border-radius: 10px; /* Add rounded corners for better aesthetics */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .reel-video:hover {
+        filter: brightness(1);
+    }
+
+    .reel-overlay {
+        position: absolute;
+        bottom: 30px;
+        left: 30%;
+        z-index: 2;
+        width: 40%; /* Match video width */
+    }
+
+    .reel-info {
+        background: rgba(0, 0, 0, 0.6);
+        padding: 15px;
+        border-radius: 10px;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .reel-info h2 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.5;
+        color: #fff;
+    }
+
+    .reel-actions {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .like-btn {
+        display: inline-block;
+        padding: 8px 12px;
+        background-color: #e50914;
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 20px;
+        transition: background-color 0.3s;
+    }
+
+    .like-btn:hover {
+        background-color: #ff4040;
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    // Smooth Scroll Between Reels
+    document.addEventListener('DOMContentLoaded', () => {
+        const reelsContainer = document.querySelector('.reels-container');
+
+        reelsContainer.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            const reelHeight = window.innerHeight;
+
+            if (event.deltaY > 0) {
+                reelsContainer.scrollBy({ top: reelHeight, behavior: 'smooth' });
+            } else {
+                reelsContainer.scrollBy({ top: -reelHeight, behavior: 'smooth' });
+            }
+        });
+    });
+</script>
+{% endblock %}

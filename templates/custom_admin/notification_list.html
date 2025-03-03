@@ -1,0 +1,48 @@
+<!-- notification_list.html -->
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Notifications</h1>
+    <a href="{% url 'notification_add' %}" class="btn btn-primary mb-3">Add New Notification</a>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Message</th>
+                <th>User</th>
+
+                <!-- Add other fields from your Notification model as needed -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notification in notifications %}
+            <tr>
+                <td>{{ notification.id }}</td>
+                <td>{{ notification.title }}</td>
+                <td>{{ notification.message|truncatechars:50 }}</td>
+                <td>{{ notification.user }}</td>
+                <!-- Add other fields from your Notification model as needed -->
+                <td>
+                    <a href="{% url 'notification_edit' notification.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'notification_delete' notification.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No notifications available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

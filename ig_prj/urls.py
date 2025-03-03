@@ -24,10 +24,16 @@ from authy.views import UserProfile, follow
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("i18n/", include("django.conf.urls.i18n")),
     path('users/', include('authy.urls')),
     path('', include('post.urls')),
     path('message/', include('directs.urls')),
     path('notifications/', include('notification.urls')),
+    path('reels', include('reels.urls')),
+    path('custom-admin/', include('custom_admin.urls')),
+    path('/chatbot', include('chatbot.urls')),
+    path('stories/', include('stories.urls')),
+    path('content_analyzer/', include('content_analyzer.urls')),
 
     # profile
     path('<username>/', UserProfile, name='profile'),

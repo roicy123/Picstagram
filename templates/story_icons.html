@@ -1,0 +1,84 @@
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Icons</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+<style>
+    /* assets1/style.css */
+.story-icons-container {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.story-icons-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+}
+
+.story-icons {
+    scroll-snap-type: x mandatory;
+}
+
+.story-icon {
+    scroll-snap-align: start;
+}
+
+.story-border {
+    position: relative;
+}
+
+.story-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.story-border.unviewed::before {
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+
+.story-border.viewed::before {
+    background: #262626;
+}
+
+.story-image {
+    position: relative;
+    z-index: 1;
+}
+</style>
+</head>
+
+<div class="story-icons-container p-4 bg-white">
+    <div class="story-icons flex space-x-4 overflow-x-auto">
+        <!-- New Story Icon -->
+        <a href="{% url 'create_story' %}" class="story-icon story-add flex flex-col items-center">
+            <div class="story-border new-story w-16 h-16 rounded-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
+                <div class="story-image w-14 h-14 rounded-full bg-black flex items-center justify-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4V20M4 12H20" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+            <span class="text-black text-sm mt-2">New</span>
+        </a>
+
+        <!-- User Story Icons -->
+        {% for user, stories in stories_by_user.items %}
+            <a href="{% url 'view_story' stories.0.id %}" class="story-icon flex flex-col items-center">
+                <div class="story-border w-16 h-16 rounded-full flex items-center justify-center {% if not user.profile in viewed_profiles %}bg-gradient-to-r from-purple-500 to-pink-500{% else %}bg-gray-700{% endif %}">
+                    <div class="story-image w-14 h-14 rounded-full overflow-hidden border-2 border-black">
+                        <img src="{{ user.profile.image.url }}" alt="{{ user.username }}'s Story" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <span class="text-black text-sm mt-2">{{ user.username }}</span>
+            </a>
+        {% endfor %}
+    </div>
+</div>

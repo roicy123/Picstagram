@@ -261,4 +261,105 @@ footer .container {
   footer {
     padding-bottom: 2rem;
   }
+  body {
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.likes-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.likes-container h2 {
+    font-size: 26px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.post-caption {
+    font-style: italic;
+    color: #555;
+}
+
+.likes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.like-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease-in-out;
+}
+
+.like-item:hover {
+    background-color: #f0f8ff;
+    transform: scale(1.02);
+}
+
+.user-link {
+    text-decoration: none;
+    color: #0073e6;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.user-link:hover {
+    text-decoration: underline;
+}
+
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 3px solid #ddd;
+    object-fit: cover;
+}
+
+.no-likes {
+    font-size: 18px;
+    color: #888;
+    margin-top: 20px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.back-link:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 10px 0;
+    background-color: #f1f1f1;
+    color: #555;
+    font-size: 14px;
+}
 }

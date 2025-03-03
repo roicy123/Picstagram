@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<br>
+<br>
+<br>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        .chat-container {
+            height: calc(100vh - 160px);
+        }
+        .message-list {
+            height: calc(100vh - 230px);
+            overflow-y: auto;
+        }
+        .user-message {
+            background-color: #f0f2f5;
+            border-radius: 18px;
+            padding: 8px 12px;
+            max-width: 80%;
+            margin-left: auto;
+        }
+        .assistant-message {
+            background-color: #e7f3ff;
+            border-radius: 18px;
+            padding: 8px 12px;
+            max-width: 80%;
+        }
+        .typing-indicator span {
+            animation-name: blink;
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-fill-mode: both;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: .2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: .4s;
+        }
+        @keyframes blink {
+            0% { opacity: .2; }
+            20% { opacity: 1; }
+            100% { opacity: .2; }
+        }
+        .sidebar {
+            width: 260px;
+            transition: all 0.3s;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                position: absolute;
+                z-index: 10;
+                height: 100vh;
+            }
+            .sidebar.open {
+                width: 260px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="flex h-screen">
+        <!-- Sidebar with conversation history -->
+        <div id="sidebar" class="sidebar bg-white shadow-md overflow-y-auto">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h2 class="font-semibold text-xl">Conversations</h2>
+                <button id="newChatBtn" class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700">
+                    <i class="fas fa-plus mr-1"></i> New
+                </button>
+            </div>
+            <div class="p-2">
+                {% if conversations %}
+                    {% for conv in conversations %}
+                        <div class="cursor-pointer p-3 rounded-lg hover:bg-gray-100 mb-1 {% if active_conversation.id == conv.id %}bg-gray-100{% endif %}"
+                             onclick="loadConversation('{{ conv.id }}')">
+                            <div class="flex items-center">
+                                <i class="fas fa-comment-dots text-blue-500 mr-3"></i>
+                                <div class="truncate">{{ conv.title }}</div>
+                            </div>
+                            <div class="text-xs text-gray-500 ml-7 mt-1">
+                                {{ conv.updated_at|date:"M d, Y" }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-gray-500 p-4">No conversations yet</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Main chat area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <header class="bg-white shadow-sm border-b p-4 flex items-center">
+                <button id="menuToggle" class="md:hidden mr-4 text-gray-700">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="flex-1">
+                    <h1 class="text-xl font-semibold">AI Assistant</h1>
+                    <p class="text-sm text-gray-500">Powered by Groq & HuggingFace</p>
+                </div>
+                <div>
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}" 
+                         class="w-10 h-10 rounded-full border-2 border-blue-200" alt="Profile">
+                </div>
+            </header>
+
+            <!-- Chat container -->
+            <div class="chat-container flex-1 p-4 overflow-hidden flex flex-col">
+                <!-- Messages area -->
+                <div id="messageList" class="message-list flex-1 space-y-4 pb-2">
+                    {% if not active_conversation.messages.exists %}
+                        <div class="flex items-center justify-center h-full flex-col">
+                            <div class="text-6xl mb-4">👋</div>
+                            <h2 class="text-2xl font-semibold mb-2">Welcome to AI Assistant</h2>
+                            <p class="text-gray-500 text-center max-w-md">
+                                I can help answer questions, generate images, and assist with various tasks.
+                                Just ask me anything!
+                            </p>
+                        </div>
+                    {% else %}
+                        {% for message in active_conversation.messages.all %}
+                            <div class="message-container {% if message.role == 'user' %}justify-end{% endif %} flex">
+                                <div class="{% if message.role == 'user' %}user-message{% else %}assistant-message{% endif %}">
+                                    <div class="message-content">{{ message.content|linebreaksbr }}</div>
+                                    {% if message.image_url %}
+                                        <div class="mt-2">
+                                            <img src="data:image/jpeg;base64,{{ message.image_url }}" 
+                                                 alt="Generated image" class="rounded-lg max-w-full">
+                                        </div>
+                                    {% endif %}
+                                    <div class="text-xs text-gray-500 mt-1 text-right">
+                                        {{ message.created_at|time:"H:i" }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Typing indicator -->
+                <div id="typingIndicator" class="typing-indicator assistant-message mb-4 hidden">
+                    <div class="flex">
+                        <span>.</span><span>.</span><span>.</span>
+                    </div>
+                </div>
+
+                <!-- Input area -->
+                <div class="mt-auto bg-white rounded-xl shadow-md border p-3">
+                    <form id="messageForm" class="flex items-end">
+                        <div class="flex-1">
+                            <textarea id="messageInput" rows="1" 
+                                      class="w-full focus:outline-none resize-none px-3 py-2"
+                                      placeholder="Message AI Assistant..."
+                                      onkeydown="handleKeyDown(event)"></textarea>
+                        </div>
+                        <div class="flex items-center">
+                            <button type="button" id="imageGenBtn" class="text-blue-500 p-2 rounded-full hover:bg-gray-100" 
+                                    title="Generate image">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <button type="submit" id="sendBtn" class="ml-1 text-white bg-blue-600 p-2 rounded-full hover:bg-blue-700">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const conversationId = "{{ active_conversation.id }}";
+        let isTyping = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageList = document.getElementById('messageList');
+            messageList.scrollTop = messageList.scrollHeight;
+            
+            // Menu toggle for mobile
+            document.getElementById('menuToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+            
+            // New chat button
+            document.getElementById('newChatBtn').addEventListener('click', function() {
+                window.location.href = "{% url 'chatbot:chat' %}";
+            });
+            
+            // Image generation shortcut
+            document.getElementById('imageGenBtn').addEventListener('click', function() {
+                const input = document.getElementById('messageInput');
+                input.value = "Generate image: ";
+                input.focus();
+            });
+        });
+        
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Add user message to UI
+            addMessageToUI('user', message);
+            
+            // Show typing indicator
+            showTypingIndicator(true);
+            
+            try {
+                const response = await fetch("{% url 'chatbot:send_message' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        conversation_id: conversationId,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Add assistant response to UI
+                    addMessageToUI('assistant', data.message, data.image);
+                } else {
+                    // Show error message
+                    addMessageToUI('assistant', 'Sorry, I encountered an error: ' + data.message);
+                }
+            } catch (error) {
+                addMessageToUI('assistant', 'Sorry, there was an error processing your request.');
+                console.error('Error:', error);
+            } finally {
+                showTypingIndicator(false);
+            }
+        }
+        
+        function addMessageToUI(role, content, image = null) {
+            const messageList = document.getElementById('messageList');
+            
+            // Create message container
+            const messageContainer = document.createElement('div');
+            messageContainer.className = `message-container ${role === 'user' ? 'justify-end' : ''} flex`;
+            
+            // Create message bubble
+            const messageBubble = document.createElement('div');
+            messageBubble.className = role === 'user' ? 'user-message' : 'assistant-message';
+            
+            // Add message content
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content.replace(/\n/g, '<br>');
+            messageBubble.appendChild(messageContent);
+            
+            // Add image if present
+            if (image) {
+                const imageElement = document.createElement('div');
+                imageElement.className = 'mt-2';
+                imageElement.innerHTML = `<img src="data:image/jpeg;base64,${image}" alt="Generated image" class="rounded-lg max-w-full">`;
+                messageBubble.appendChild(imageElement);
+            }
+            
+            // Add timestamp
+            const timestamp = document.createElement('div');
+            timestamp.className = 'text-xs text-gray-500 mt-1 text-right';
+            const now = new Date();
+            timestamp.textContent = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            messageBubble.appendChild(timestamp);
+            
+            // Assemble and add to message list
+            messageContainer.appendChild(messageBubble);
+            messageList.appendChild(messageContainer);
+            
+            // Remove welcome message if it exists
+            const welcomeMessage = messageList.querySelector('.flex.items-center.justify-center.h-full');
+            if (welcomeMessage) {
+                welcomeMessage.remove();
+            }
+            
+            // Scroll to bottom
+            messageList.scrollTop = messageList.scrollHeight;
+        }
+        
+        function showTypingIndicator(show) {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.classList.toggle('hidden', !show);
+            
+            if (show) {
+                const messageList = document.getElementById('messageList');
+                messageList.scrollTop = messageList.scrollHeight;
+            }
+        }
+        
+        function loadConversation(id) {
+            window.location.href = `{% url 'chatbot:chat' %}?conversation_id=${id}`;
+        }
+        
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        // Form submission
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            sendMessage();
+        });
+        
+        // Helper to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
+{% endblock content %}

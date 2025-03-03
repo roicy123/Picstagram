@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://kit.fontawesome.com/fc1e235b2e.js"></script>
+    <link rel="stylesheet" href="{% static 'assets2/style.css' %}">
+    <title>Likes</title>
+</head>
+
+<body>
+
+<br>
+<br>
+<br>
+<div class="likes-container">
+    <h2>💖 Likes for: <span class="post-caption">{{ post.caption }}</span></h2>
+    <ul class="likes-list">
+        {% for like in likes %}
+            <li class="like-item">
+                <a href="{% url 'profile' like.user.username %}" class="user-link">
+                    <img src="{{ like.user.profile.image.url }}" alt="Profile Picture" class="profile-pic">
+                    <span>{{ like.user.username }}</span>
+                </a>
+            </li>
+        {% empty %}
+            <li class="no-likes">No likes yet. Be the first to like this post!</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'post-details' post.id %}" class="back-link">⬅️ Back to Post</a>
+</div>
+</body>
+{% endblock %}

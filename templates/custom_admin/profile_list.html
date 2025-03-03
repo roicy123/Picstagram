@@ -1,0 +1,14 @@
+{% extends 'custom_admin/base.html' %}
+{% block content %}
+    <h2>All Profiles</h2>
+    <a href="{% url 'profile_create' %}">Add New Profile</a>
+    <ul>
+        {% for profile in profiles %}
+            <li>
+                <a href="{% url 'profile_detail' profile.pk %}">{{ profile.user.username }}</a> 
+                <a href="{% url 'profile_update' profile.pk %}">Edit</a> 
+                <a href="{% url 'profile_delete' profile.pk %}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5"><br>
+  <h2 class="text-center mb-4">Followers</h2>
+  <div class="row justify-content-center">
+    <ul class="list-group col-md-6">
+      {% for follow in followers %}
+        <li class="list-group-item d-flex align-items-center">
+          <img 
+            src="{{ follow.follower.profile.image.url }}" 
+            alt="Profile Picture" 
+            class="rounded-circle me-3" 
+            style="width: 40px; height: 40px; object-fit: cover;">
+          <a href="{% url 'profile' follow.follower.username %}" class="text-decoration-none text-dark">
+            {{ follow.follower.username }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

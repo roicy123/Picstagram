@@ -1,0 +1,43 @@
+<!-- comment_list.html -->
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Comments</h1>
+    <a href="{% url 'comment_add' %}" class="btn btn-primary mb-3">Add New Comment</a>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Content</th>
+                <!-- Add other fields from your Comment model -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comment in comments %}
+            <tr>
+                <td>{{ comment.id }}</td>
+                <td>{{ comment.content|truncatechars:50 }}</td>
+                <!-- Add other fields from your Comment model -->
+                <td>
+                    <a href="{% url 'comment_edit' comment.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'comment_delete' comment.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No comments available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

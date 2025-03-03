@@ -1,0 +1,23 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+    <h2>Streams</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Post</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stream in streams %}
+                <tr>
+                    <td>{{ stream.user.username }}</td>
+                    <td>{{ stream.post.caption }}</td>
+                    <td>{{ stream.date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

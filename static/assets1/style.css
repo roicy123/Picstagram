@@ -641,8 +641,11 @@ img { max-width: 100%; }
 }
 .side-menu__suggestion {
     display: flex;
-    align-items: center;
+    flex-direction: column; /* Change to column for vertical alignment */
+    align-items: flex-start; /* Align items to the start */
+    margin-bottom: 16px; /* Add some space between suggestions */
 }
+
 .side-menu__suggestion-avatar {
     width: 32px;
     height: 32px;
@@ -776,6 +779,48 @@ img { max-width: 100%; }
     border: 1px solid var(--img-border);
     border-radius: 50%;
 }
+.floating-chatbot {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .chatbot-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+  
+  .chatbot-button:hover {
+    transform: scale(1.1);
+  }
+  
+  .chatbot-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    margin-bottom: 5px;
+  }
+  
+  .chatbot-button:hover .chatbot-tooltip {
+    opacity: 1;
+  }
 
 
 /* Media Queries */

@@ -94,7 +94,13 @@ img {
     border: 0.1rem solid #dbdbdb;
     border-radius: 0.3rem;
     padding: 0 2.4rem;
-    margin-left: 2rem;
+    margin: 0;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 1rem; /* Adjust the spacing between the buttons */
+    align-items: center; /* Align the buttons vertically in the center */
 }
 
 .profile-settings-btn {

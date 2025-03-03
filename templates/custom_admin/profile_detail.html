@@ -1,0 +1,11 @@
+{% extends 'custom_admin/base.html' %}
+{% block content %}
+    <h2>{{ profile.user.username }}'s Profile</h2>
+    <img src="{{ profile.image.url }}" alt="Profile Picture" width="100">
+    <p>Name: {{ profile.first_name }} {{ profile.last_name }}</p>
+    <p>Bio: {{ profile.bio }}</p>
+    <p>Location: {{ profile.location }}</p>
+    <p>URL: <a href="{{ profile.url }}">{{ profile.url }}</a></p>
+    <a href="{% url 'profile_update' profile.pk %}">Edit Profile</a>
+    <a href="{% url 'profile_list' %}">Back to Profiles</a>
+{% endblock %}

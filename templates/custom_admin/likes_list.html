@@ -1,0 +1,47 @@
+<!-- likes_list.html -->
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Likes</h1>
+    <a href="{% url 'likes_add' %}" class="btn btn-primary mb-3">Add New Like</a>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Content</th>
+                <th>Timestamp</th>
+                <!-- Add other fields from your Likes model as needed -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for like in likes %}
+            <tr>
+                <td>{{ like.id }}</td>
+                <td>{{ like.user }}</td>
+                <td>{{ like.content_type }} - {{ like.object_id }}</td>
+                <td>{{ like.created_at }}</td>
+                <!-- Add other fields from your Likes model as needed -->
+                <td>
+                    <a href="{% url 'likes_edit' like.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'likes_delete' like.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No likes available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

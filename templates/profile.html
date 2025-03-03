@@ -37,19 +37,21 @@
                 </div>
 
                 <div class="profile-user-settings">
+                        <h4 style="font-size: 35px; font-weight: bold;" class="profile-user-name">{{profile.user.username}}</h4><br><br>
                         {% if profile.first_name %}
-                        <h6 class="profile-user-name">{{profile.first_name}} {{profile.last_name}}</h6> <br>
+                        <h4 class="profile-user-name">{{profile.first_name}} {{profile.last_name}}</h4> <br> <br>
                         {% endif %}
-                        <h5 style="font-size: 15px;" class="profile-user-name">@{{profile.user.username}}</h5>
 
                         {% if request.user.is_authenticated and request.user == profile.user %}
-                        <a style="text-decoration: none;" href="{% url 'editprofile' %}" class="btn profile-edit-btn">Edit Profile</a>
-                        <a style="text-decoration: none;" href="{% url 'sign-out' %}" class="btn profile-edit-btn">Logout</a>
-                        <button class="btn profile-settings-btn" aria-label="profile settings"><i class="fas fa-cog" aria-hidden="true"></i></button>
-
-                        
+                        <div class="profile-actions">
+                            <a href="{% url 'editprofile' %}" class="btn profile-edit-btn">Edit Profile</a>
+                            <form method="POST" action="{% url 'sign-out' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn profile-edit-btn">Logout</button>
+                            </form>
+                        </div>
                         {% endif %}
-                        <br><br>
+                        
                         {% if request.user.is_authenticated and request.user != profile.user %}
                             {% if follow_status == True %}
                                 <a href="{% url 'follow' profile.user 0 %}" class="btn profile-edit-btn" style="color: red;">Unfollow</a> <br><br>
@@ -61,13 +63,7 @@
                         {% if request.user.is_authenticated and request.user != profile.user %}
                                 <a href="{% url 'conversation' profile.user  %}" class="btn profile-edit-btn">Message</a> <br><br>
                         {% endif %}
-                        <br>
-
-                    
-                    
-                    
-                    
-
+                        <br> 
                 </div>
 
                 
@@ -75,34 +71,26 @@
                 <div class="profile-bio">
                     <br>
                     {% if profile.bio %}
-                    <p><span class="profile-real-name"></span>◉ {{profile.bio}}</p>
+                    <p><span class="profile-real-name"></span>{{profile.bio}}</p>
                     {% endif %}
                     {% if profile.location %}
-                    <p><span class="profile-real-name"></span>◉ {{profile.location}}</p>
+                    <p><span class="profile-real-name"></span>{{profile.location}}</p>
                     {% endif %}
                     {% if profile.url %}
-                    <p><span class="profile-real-name"></span>◉ <a href="{{profile.url}}">{{profile.url}}</a></p>
+                    <p><span class="profile-real-name"></span><a href="{{profile.url}}">{{profile.url}}</a></p>
                     {% endif %}
-                    <br><br>
-                    <div class="profile-user-settings">
-                        <a  href="{% url 'profile' profile.user %}"  class="btns profiele-edit-btn">Posts</a>
-                        {% if request.user == profile.user %}
-                        <a  href="{% url 'profilefavourite' profile.user %}"  class="btns profeile-edit-btn">Saved</a>
-                        {% endif %}
-                    </div>
-                </div>
-
-
-                <div class="profile-stats">
-
-                    <ul>
-                        <li><span class="profile-stat-count">{{posts_count}}</span> posts</li>
-                        <li><span class="profile-stat-count">{{followers_count}}</span> followers</li>
-                        <li><span class="profile-stat-count">{{following_count}}</span> following</li>
-                    </ul>
                     <br>
-                    
-                </div>
+                    <div class="profile-stats">
+
+                        <ul>
+                            <li><a href="{% url 'profile' profile.user %}"style="text-decoration: none; color: black;"><span class="profile-stat-count">{{ posts_count }}</span> Posts</a></li>
+                            <li><a href="{% url 'followers' %}" style="text-decoration: none; color: black;"><span class="profile-stat-count">{{ followers_count }}</span> Followers</a></li>
+                            <li><a href="{% url 'following' %}" style="text-decoration: none; color: black;"><span class="profile-stat-count">{{ following_count }}</span> Following</a></li>
+                        </ul>                        
+                        <br>
+                        
+                    </div>
+                    <br><br>
 
             </div>
             <!-- End of profile section -->

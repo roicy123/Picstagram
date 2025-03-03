@@ -1,0 +1,10 @@
+{% extends 'custom_admin/base.html' %}
+{% block content %}
+    <h2>Delete Profile</h2>
+    <p>Are you sure you want to delete the profile of "{{ profile.user.username }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirm</button>
+    </form>
+    <a href="{% url 'profile_list' %}">Cancel</a>
+{% endblock %}

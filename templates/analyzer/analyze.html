@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <br>
+    <br>
+    <br>
+    <h2>Content Analyzer</h2>
+    <form method="POST" id="analyzeForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="content">Content:</label>
+            <textarea class="form-control" name="content" id="content" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="post_type">Post Type:</label>
+            <select class="form-control" name="post_type" id="post_type">
+                <option value="general">General Post</option>
+                <option value="photo">Photo Caption</option>
+                <option value="video">Video Description</option>
+                <option value="story">Story</option>
+                <option value="reel">Reel</option>
+            </select>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Analyze</button>
+    </form>
+    <div id="results" class="mt-4"></div>
+</div>
+
+<script>
+document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    fetch('/content_analyzer/analyze/', {
+        method: 'POST',
+        body: new FormData(this),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('results').innerHTML = `
+                <div class="alert alert-success">
+                    <h4>Analysis Results:</h4>
+                    <p>Sentiment: ${data.sentiment}</p>
+                    <p>Engagement Score: ${data.engagement_score}</p>
+                    <p>Content Safety: ${data.is_safe ? 'Safe' : 'Review Recommended'}</p>
+                    <h5>Improved Content:</h5>
+                    <p>${data.improved_content}</p>
+                </div>
+            `;
+        } else {
+            document.getElementById('results').innerHTML = `
+                <div class="alert alert-danger">
+                    Analysis failed: ${data.error}
+                </div>
+            `;
+        }
+    });
+});
+</script>
+{% endblock %}

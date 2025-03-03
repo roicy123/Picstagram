@@ -1,0 +1,136 @@
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets1/style.css' %}">
+</head>
+
+<body class="bg-black">
+
+<div class="story-viewer relative w-full h-screen flex items-center justify-center">
+    
+    <!-- Story Progress Bar -->
+    <div class="story-progress absolute top-6 left-4 right-4 z-10">
+        <div class="story-progress-bar bg-gray-700 h-1 rounded-full overflow-hidden">
+            <div class="story-progress-inner bg-white h-1 rounded-full transition-all duration-[5s] ease-linear" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <a href="{% url 'index' %}" class="absolute top-4 right-6 z-10 text-gray-300 transition hover:scale-110 hover:text-red-400">
+        <i class="fa-solid fa-times text-3xl"></i>
+    </a>
+
+    <!-- User Info with Glassmorphism -->
+    <div class="story-header absolute top-6 left-6 z-10 bg-white bg-opacity-20 backdrop-blur-md p-2 rounded-lg flex items-center">
+        <img src="{{ story.user.profile.image.url }}" alt="{{ story.user.username }}" class="w-10 h-10 rounded-full border-2 border-white">
+        <div class="story-user-info ml-3">
+            <span class="username text-gray-300 font-semibold">{{ story.user.username }}</span>
+            <span class="timestamp text-gray-300 text-sm">{{ story.created_at|timesince }} ago</span>
+        </div>
+    </div>
+
+    <!-- Story Content -->
+    <div class="story-content relative w-full h-full">
+        <div class="story-media-container w-full h-full flex items-center justify-center">
+            {% if story.is_video %}
+            <video class="story-media w-full h-full object-cover" autoplay muted playsinline>
+                <source src="{{ story.media.url }}" type="video/mp4">
+            </video>
+            {% else %}
+            <img class="story-media w-full h-full object-cover blur-sm" src="{{ story.media.url }}" alt="Story image">
+            {% endif %}
+
+            <!-- Caption -->
+            {% if story.caption %}
+            <div class="story-caption absolute bottom-12 left-4 right-4 text-white text-center bg-black bg-opacity-40 p-2 rounded-lg">
+                {{ story.caption }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Navigation Arrows with Hover Effects -->
+        <div class="story-navigation absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-4">
+            {% if prev_id %}
+            <a href="{% url 'view_story' prev_id %}" class="story-nav-prev text-white transition hover:scale-110 hover:text-blue-400">
+                <i class="fa-solid fa-chevron-left text-3xl"></i>
+            </a>
+            {% endif %}
+            
+            {% if next_id %}
+            <a href="{% url 'view_story' next_id %}" class="story-nav-next text-white transition hover:scale-110 hover:text-blue-400">
+                <i class="fa-solid fa-chevron-right text-3xl"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer (Like & Views) -->
+    <div class="story-footer absolute bottom-6 left-6 right-6 z-10 bg-white bg-opacity-20 backdrop-blur-md p-3 rounded-lg flex items-center justify-between">
+        <form class="story-like-form" data-story-id="{{ story.id }}" method="post" action="{% url 'like_story' story.id %}">
+            {% csrf_token %}
+            <button type="submit" class="story-like-button text-white transition transform hover:scale-125">
+                <i class="fa-solid fa-heart {% if has_liked %} text-red-500 {% else %} text-gray-400 {% endif %} text-2xl"></i>
+            </button>
+            <span class="likes-count text-gray-300 ml-2">{{ likes_count }}</span>
+        </form>
+
+        <div class="story-views flex items-center text-gray-300">
+            <i class="fa-solid fa-eye text-xl"></i>
+            <span class="views-count ml-2">{{ views_count }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Enhancements -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Auto-advance story after 5s
+        let progressBar = document.querySelector(".story-progress-inner");
+        progressBar.style.width = "100%";
+
+        setTimeout(() => {
+            {% if next_id %}
+            window.location.href = "{% url 'view_story' next_id %}";
+            {% endif %}
+        }, 5000);
+
+        // Like button animation
+        document.querySelector('.story-like-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const likeButton = form.querySelector('.story-like-button i');
+            const likesCountElement = form.querySelector('.likes-count');
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.liked) {
+                        likeButton.classList.add('text-red-500');
+                        likeButton.classList.remove('text-gray-400');
+                        likeButton.classList.add('animate-ping');
+                        setTimeout(() => likeButton.classList.remove('animate-ping'), 300);
+                    } else {
+                        likeButton.classList.remove('text-red-500');
+                        likeButton.classList.add('text-gray-400');
+                    }
+                    likesCountElement.textContent = data.likes_count;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+
+</body>

@@ -1,0 +1,21 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+    <h2>Tags</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Slug</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tag in tags %}
+                <tr>
+                    <td>{{ tag.title }}</td>
+                    <td>{{ tag.slug }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

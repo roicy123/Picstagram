@@ -1,0 +1,59 @@
+<!-- reel_list.html -->
+{% extends 'custom_admin/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Reels</h1>
+    <a href="{% url 'reel_add' %}" class="btn btn-primary mb-3">Add New Reel</a>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Views</th>
+                <th>Created</th>
+                <th>Video</th>
+                <!-- Add other fields from your Reel model as needed -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reel in reels %}
+            <tr>
+                <td>{{ reel.id }}</td>
+                <td>{{ reel.user }}</td>
+                <td>{{ reel.title }}</td>
+                <td>{{ reel.description|truncatechars:50 }}</td>
+                <td>{{ reel.views }}</td>
+                <td>{{ reel.created_at }}</td>
+                <td>
+                    {% if reel.video %}
+                        <a href="{{ reel.video.url }}" target="_blank">View</a>
+                    {% else %}
+                        No video
+                    {% endif %}
+                </td>
+                <!-- Add other fields from your Reel model as needed -->
+                <td>
+                    <a href="{% url 'reel_edit' reel.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'reel_delete' reel.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">No reels available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

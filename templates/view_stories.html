@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets1/style.css' %}">
+</head>
+
+<div class="stories-container bg-black h-screen flex items-center justify-center relative">
+    <div class="stories-header absolute top-6 left-6 right-6 z-10 flex justify-between items-center">
+        <span class="close-stories text-white text-2xl cursor-pointer">&times;</span>
+        <h2 class="text-white text-xl font-semibold">Stories</h2>
+    </div>
+
+    <div class="stories-sidebar absolute top-20 left-6 z-10">
+        <h3 class="text-white text-lg font-semibold mb-4">Stories</h3>
+        <ul class="user-stories-list space-y-4">
+            {% for user, user_stories in stories_by_user.items %}
+            <li {% if forloop.first %}class="active"{% endif %}>
+                <a href="{% url 'view_story' user_stories.0.id %}" data-user-id="{{ user.id }}" class="flex items-center space-x-3">
+                    <img src="{{ user.profile.image.url }}" alt="{{ user.username }}" class="w-10 h-10 rounded-full">
+                    <span class="text-white">{{ user.username }}</span>
+                    <small class="text-gray-400">{{ user_stories|length }} new</small>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="stories-display w-full h-full">
+        <div class="stories-loading absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <div class="spinner"></div>
+        </div>
+        <div class="stories-frame w-full h-full" id="stories-frame">
+            <!-- Story content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const usersList = document.querySelectorAll('.user-stories-list li a');
+        const storiesFrame = document.getElementById('stories-frame');
+        
+        // Load first story automatically
+        if (usersList.length > 0) {
+            loadStory(usersList[0].getAttribute('href'));
+            usersList[0].parentElement.classList.add('active');
+        }
+        
+        // Handle clicking on a user's story
+        usersList.forEach(userLink => {
+            userLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Update active class
+                document.querySelector('.user-stories-list li.active')?.classList.remove('active');
+                this.parentElement.classList.add('active');
+                
+                // Load the story
+                loadStory(this.getAttribute('href'));
+            });
+        });
+        
+        function loadStory(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    storiesFrame.innerHTML = html;
+                    initStoryInteractions();
+                })
+                .catch(error => {
+                    console.error('Error loading story:', error);
+                });
+        }
+        
+        // Close button
+        document.querySelector('.close-stories').addEventListener('click', function() {
+            window.location.href = '{% url "home" %}';
+        });
+    });
+    
+    function initStoryInteractions() {
+        // Initialize any JS needed for story interactions
+        const storyVideo = document.querySelector('.story-media video');
+        if (storyVideo) {
+            storyVideo.play();
+        }
+        
+        // Progress bar
+        const progressBar = document.querySelector('.story-progress-inner');
+        const storyDuration = 5000; // 5 seconds for image stories
+        
+        if (progressBar) {
+            let startTime = Date.now();
+            let timer = setInterval(() => {
+                const elapsedTime = Date.now() - startTime;
+                const progress = Math.min(elapsedTime / storyDuration * 100, 100);
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(timer);
+                    // Move to next story if available
+                    const nextButton = document.querySelector('.story-nav-next');
+                    if (nextButton && nextButton.getAttribute('href') !== '#') {
+                        window.location.href = nextButton.getAttribute('href');
+                    }
+                }
+            }, 50);
+            
+            // If video, use video duration instead
+            if (storyVideo) {
+                clearInterval(timer);
+                storyVideo.addEventListener('timeupdate', () => {
+                    const progress = (storyVideo.currentTime / storyVideo.duration) * 100;
+                    progressBar.style.width = `${progress}%`;
+                });
+                
+                storyVideo.addEventListener('ended', () => {
+                    // Move to next story if available
+                    const nextButton = document.querySelector('.story-nav-next');
+                    if (nextButton && nextButton.getAttribute('href') !== '#') {
+                        window.location.href = nextButton.getAttribute('href');
+                    }
+                });
+            }
+        }
+    }
+</script>
+
+{% endblock %}
