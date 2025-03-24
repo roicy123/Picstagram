@@ -17,6 +17,23 @@ from .forms import EditProfileForm, UserRegisterForm
 from django.urls import resolve
 from comment.models import Comment
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+
+from django.core.mail import send_mail
+from .forms import PasswordResetForm
+
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+
+
 def UserProfile(request, username):
     try:
         user = get_object_or_404(User, username=username)
@@ -134,4 +151,3 @@ def register(request):
         'form': form,
     }
     return render(request, 'sign-up.html', context)
-

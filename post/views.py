@@ -13,6 +13,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.utils import timezone
 from stories.models import Story
+from .content_analyzer import validate_content
+import json
 
 @login_required
 def index(request):
@@ -70,32 +72,77 @@ def index(request):
     }
     return render(request, 'index.html', context)
 
+class ContentAnalyzedPostForm(NewPostform):
+    """Extended post form with content analysis"""
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        caption = cleaned_data.get('caption', '')
+        picture = cleaned_data.get('picture')
+        
+        # Analyze content
+        results = validate_content(caption, picture)
+        
+        # Store recommendations for view to display
+        self.content_analysis_results = results
+        
+        return cleaned_data
 
 @login_required
 def NewPost(request):
     user = request.user
     profile = get_object_or_404(Profile, user=user)
+    content_analysis_results = None
 
     if request.method == "POST":
-        form = NewPostform(request.POST, request.FILES)
+        form = ContentAnalyzedPostForm(request.POST, request.FILES)
         if form.is_valid():
             picture = form.cleaned_data.get('picture')
             caption = form.cleaned_data.get('caption')
             tag_form = form.cleaned_data.get('tags', '')
-
-            tag_list = [tag.strip() for tag in tag_form.split(',') if tag.strip()]  # Avoid empty tags
+            
+            # Get analysis results
+            content_analysis_results = getattr(form, 'content_analysis_results', None)
+            
+            # Check if user wants to proceed despite recommendations
+            if 'ignore_recommendations' not in request.POST and content_analysis_results and content_analysis_results['recommendations']:
+                # Show recommendations before posting
+                context = {
+                    'form': form,
+                    'analysis_results': content_analysis_results,
+                    'show_recommendations': True
+                }
+                return render(request, 'newpost.html', context)
+            
+            # Process tags
+            tag_list = [tag.strip() for tag in tag_form.split(',') if tag.strip()]
+            
+            # Add suggested hashtags if enabled
+            if 'use_suggested_hashtags' in request.POST and content_analysis_results and content_analysis_results.get('text_analysis', {}).get('suggested_hashtags'):
+                for tag in content_analysis_results['text_analysis']['suggested_hashtags'][:5]:  # Limit to 5 suggestions
+                    if tag not in tag_list:
+                        tag_list.append(tag)
+            
             tags_obj = [Tag.objects.get_or_create(title=tag)[0] for tag in tag_list]
 
             p, created = Post.objects.get_or_create(picture=picture, caption=caption, user=user)
             p.tags.set(tags_obj)
+            
+            # Store reach score and analysis metadata
+            if content_analysis_results:
+                p.reach_score = content_analysis_results.get('reach_score', 0)
+                p.content_analysis = json.dumps(content_analysis_results)
+            
             p.save()
             return redirect('profile', request.user.username)
-        else:
-            context = {'form': form, 'error': 'Form validation failed'}
-            return render(request, 'newpost.html', context)
     else:
-        form = NewPostform()
-    return render(request, 'newpost.html', {'form': form})
+        form = ContentAnalyzedPostForm()
+    
+    context = {
+        'form': form,
+        'analysis_results': content_analysis_results
+    }
+    return render(request, 'newpost.html', context)
 
 @login_required
 def PostDetail(request, post_id):

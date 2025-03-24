@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from django.urls import reverse
 import uuid
 from notification.models import Notification
-
+import json
 
 
 # uploading user files to a specific directory
@@ -45,6 +45,36 @@ class Post(models.Model):
     tags = models.ManyToManyField(Tag, related_name="tags")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     likes = models.IntegerField(default=0)
+    reach_score = models.FloatField(default=0)
+    content_analysis = models.TextField(blank=True, null=True)
+    is_appropriate = models.BooleanField(default=True)
+    sentiment_score = models.FloatField(default=0)
+    
+    def __str__(self):
+        return f"{self.user.username}'s post ({self.id})"
+    
+    def get_absolute_url(self):
+        return reverse('post-details', args=[str(self.id)])
+    
+    def get_analysis_data(self):
+        """Return content analysis as a Python dictionary"""
+        if not self.content_analysis:
+            return {}
+        try:
+            return json.loads(self.content_analysis)
+        except json.JSONDecodeError:
+            return {}
+    
+    def get_recommendations(self):
+        """Return content recommendations list"""
+        analysis = self.get_analysis_data()
+        return analysis.get('recommendations', [])
+    
+    def get_suggested_hashtags(self):
+        """Return suggested hashtags from analysis"""
+        analysis = self.get_analysis_data()
+        text_analysis = analysis.get('text_analysis', {})
+        return text_analysis.get('suggested_hashtags', [])
 
     def get_absolute_url(self):
         return reverse("post-details", args=[str(self.id)])

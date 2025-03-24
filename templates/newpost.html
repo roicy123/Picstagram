@@ -1,47 +1,92 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 {% load static %}
 {% load crispy_forms_tags %}
+
 {% block content %}
 <br><br>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <script src="https://kit.fontawesome.com/fc1e235b2e.js"></script>
   <link rel="stylesheet" href="{% static 'assets2/style.css' %}">
-  <title>Instagram Login Form</title>
+  <title>Create New Post</title>
+  <style>
+    .logo h3 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .form-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    .form-btn:hover {
+      background: #0056b3;
+    }
+
+
+
+    .alert {
+      background: #ffebcc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .alert strong {
+      color: #d9534f;
+    }
+  </style>
 </head>
 
 <body>
-
   <div id="wrapper">
     <div class="container">
-      <div class="phone-app-ddemo"></div>
       <div class="form-data">
         <form action="" method="POST" enctype="multipart/form-data">
-			{% csrf_token %}
+          {% csrf_token %}
+
           <div class="logo">
-            <h3 style="padding: 20px; font-size: 20px;">Create New Post</h3>
+            <h3>Create New Post</h3>
           </div>
-		  <!-- {{ form|crispy }} -->
-          {{form.picture}} <br>
-          {{form.caption}} <br>
-          {{form.tags}} <br>
+
+          {{ form|crispy }}
+
+          {% if show_recommendations %}
+            <div class="alert">
+              <strong>Content Analysis Suggestions:</strong>
+              <ul>
+                {% for recommendation in analysis_results.recommendations %}
+                  <li>{{ recommendation }}</li>
+                {% endfor %}
+              </ul>
+              <button class="form-btn" type="submit" name="ignore_recommendations">Post Anyway</button>
+            </div>
+          {% endif %}
+
           <button class="form-btn" type="submit">Post</button>
           <a href="{% url 'upload-reel' %}" class="btn">Upload a Reel</a>
-          <!-- <a href="index.html" class="form-btn" type="submit">Log in</a> -->
-          
         </form>
-        
       </div>
     </div>
-
   </div>
-
 </body>
-
 </html>
+
 {% endblock content %}

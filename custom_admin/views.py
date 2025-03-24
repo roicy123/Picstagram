@@ -13,6 +13,10 @@ from post.models import Likes
 from post.models import Follow 
 from post.models import Stream 
 from reels.models import Reel
+from django.db.models import Count
+from django.contrib.auth import logout
+
+
 
 def custom_admin_login(request):
     if request.method == 'POST':
@@ -28,17 +32,39 @@ def custom_admin_login(request):
 
 @login_required(login_url='custom_admin_login')
 def custom_admin_dashboard(request):
-    # Example data for charts
+    # Basic counts
     post_count = Post.objects.count()
-    user_count = Profile.objects.count()
+    profile_count = Profile.objects.count()  # Use Profile instead of User
     comment_count = Comment.objects.count()
+
+    # Posts over time (group by date)
+    post_dates = Post.objects.values('posted').annotate(count=Count('id')).order_by('posted')
+    post_counts = [item['count'] for item in post_dates]
+    post_dates = [item['posted'].strftime('%Y-%m-%d') for item in post_dates]
+
+    # User activity (example)
+    activity_labels = ['Posts', 'Comments', 'Likes']
+    activity_data = [post_count, comment_count, Likes.objects.count()]
+
+    # Top liked posts
+    top_liked_posts = Post.objects.order_by('-likes')[:5]
+
+    # Most active profiles (instead of users)
+    most_active_profiles = Profile.objects.annotate(post_count=Count('user__post')).order_by('-post_count')[:5]
 
     context = {
         'post_count': post_count,
-        'user_count': user_count,
+        'profile_count': profile_count,  # Updated to profile_count
         'comment_count': comment_count,
+        'post_dates': post_dates,
+        'post_counts': post_counts,
+        'activity_labels': activity_labels,
+        'activity_data': activity_data,
+        'top_liked_posts': top_liked_posts,
+        'most_active_profiles': most_active_profiles,  # Updated to most_active_profiles
     }
     return render(request, 'custom_admin/dashboard.html', context)
+
 
 @login_required(login_url='custom_admin_login')
 def profile_list(request):
@@ -364,3 +390,8 @@ def reel_delete(request, pk):
         django_messages.success(request, 'Reel deleted successfully!')
         return redirect('reel_list')
     return render(request, 'custom_admin/reel_delete.html', {'object': reel})
+
+@login_required(login_url='custom_admin_login')
+def custom_admin_logout(request):
+    logout(request)
+    return redirect('custom_admin_login')

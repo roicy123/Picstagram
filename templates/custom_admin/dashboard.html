@@ -1,9 +1,154 @@
 {% extends 'custom_admin/base.html' %}
 
 {% block content %}
-    <h2>Admin Dashboard</h2>
-    <p>Total Posts: {{ post_count }}</p>
-    <p>Total Users: {{ user_count }}</p>
-    <p>Total Comments: {{ comment_count }}</p>
-    <!-- Add charts here using a library like Chart.js -->
+    <h1 class="mb-4">Admin Dashboard</h1>
+    <div class="row">
+        <!-- Cards for Quick Stats -->
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Posts</h5>
+                    <p class="card-text">{{ post_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Profiles</h5>
+                    <p class="card-text">{{ profile_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Comments</h5>
+                    <p class="card-text">{{ comment_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Posts Over Time</h5>
+                    <canvas id="postsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">User Activity</h5>
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Data Visualization -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Top Liked Posts</h5>
+                    <ul class="list-group">
+                        {% for post in top_liked_posts %}
+                            <li class="list-group-item">{{ post.caption }} - {{ post.likes }} likes</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Most Active Profiles</h5>
+                        <ul class="list-group">
+                            {% for profile in most_active_profiles %}
+                                <li class="list-group-item">{{ profile.user.username }} - {{ profile.post_count }} posts</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Scripts -->
+    <script>
+        // Posts Over Time Chart
+        const postsCtx = document.getElementById('postsChart').getContext('2d');
+        const postsChart = new Chart(postsCtx, {
+            type: 'line',
+            data: {
+                labels: {{ post_dates|safe }},
+                datasets: [{
+                    label: 'Posts',
+                    data: {{ post_counts|safe }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Posts'
+                        }
+                    }
+                }
+            }
+        });
+
+        // User Activity Chart
+        const activityCtx = document.getElementById('activityChart').getContext('2d');
+        const activityChart = new Chart(activityCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ activity_labels|safe }},
+                datasets: [{
+                    label: 'Activity',
+                    data: {{ activity_data|safe }},
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Activity Type'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Count'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 {% endblock %}

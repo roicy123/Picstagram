@@ -4,7 +4,7 @@
 <html lang="en">
 
 <head>
-    <title>Instagram</title>
+    <title>Picstagram</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{% static 'assets1/favicon.svg' %}" type="image/x-icon">
@@ -12,6 +12,69 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'assets1/style.css' %}">
     <script src="{% static 'assets1/script.js' %}" defer></script>
+    <style>
+    /* Voice Recognition Animation */
+    .voice-recognition-animation {
+        position: fixed;
+        bottom: 40px; /* Adjusted for better positioning */
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: flex-end; /* Align bars to the bottom */
+        justify-content: center;
+        gap: 8px; /* Gap between bars */
+        z-index: 1000;
+        display: none; /* Hidden by default */
+        height: 60px; /* Height of the animation container */
+    }
+
+    .voice-recognition-bar {
+        width: 10px; /* Width of each bar */
+        height: 20px; /* Initial height of bars */
+        background-color: #007AFF; /* Siri-like blue */
+        border-radius: 5px; /* Slightly rounded corners */
+        animation: bar-pulse 1.2s infinite ease-in-out;
+    }
+
+    .voice-recognition-bar:nth-child(2) {
+        animation-delay: 0.3s; /* Delay for smoother effect */
+    }
+
+    .voice-recognition-bar:nth-child(3) {
+        animation-delay: 0.6s; /* Delay for smoother effect */
+    }
+
+    @keyframes bar-pulse {
+        0%, 100% {
+            transform: scaleY(1); /* Normal height */
+        }
+        50% {
+            transform: scaleY(2.5); /* Bars grow taller */
+        }
+    }
+
+    /* Add a glowing effect to the bars */
+    .voice-recognition-bar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: rgba(0, 122, 255, 0.3); /* Glow effect */
+        animation: bar-glow 1.2s infinite ease-in-out;
+    }
+
+    @keyframes bar-glow {
+        0%, 100% {
+            opacity: 0.5;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+    </style>
 </head>
 
 <body>
@@ -103,14 +166,19 @@
                     </svg>
                 </a>
                 </span>
-                <span>
-                    <a href="{% url 'analyze' %}">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M11.4995 21.2609C11.1062 21.2609 10.7307 21.1362 10.4133 20.9001C8.2588 19.3012 3.10938 15.3239 1.81755 12.9143C0.127895 9.76543 1.14258 5.72131 4.07489 3.89968C5.02253 3.31177 6.09533 3 7.18601 3C8.81755 3 10.3508 3.66808 11.4995 4.85726C12.6483 3.66808 14.1815 3 15.8131 3C16.9038 3 17.9766 3.31177 18.9242 3.89968C21.8565 5.72131 22.8712 9.76543 21.186 12.9143C19.8942 15.3239 14.7448 19.3012 12.5902 20.9001C12.2684 21.1362 11.8929 21.2609 11.4995 21.2609ZM7.18601 4.33616C6.34565 4.33616 5.5187 4.57667 4.78562 5.03096C2.43888 6.49183 1.63428 9.74316 2.99763 12.2819C4.19558 14.5177 9.58639 18.6242 11.209 19.8267C11.3789 19.9514 11.6158 19.9514 11.7856 19.8267C13.4082 18.6197 18.799 14.5133 19.997 12.2819C21.3603 9.74316 20.5557 6.48738 18.209 5.03096C17.4804 4.57667 16.6534 4.33616 15.8131 4.33616C14.3425 4.33616 12.9657 5.04878 12.0359 6.28696L11.4995 7.00848L10.9631 6.28696C10.0334 5.04878 8.6611 4.33616 7.18601 4.33616Z" fill="var(--text-dark)" stroke="var(--text-dark)" stroke-width="0.6"/>
-                        </svg>
+                <button id="mic-button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 14.5C13.66 14.5 15 13.16 15 11.5V5.5C15 3.84 13.66 2.5 12 2.5C10.34 2.5 9 3.84 9 5.5V11.5C9 13.16 10.34 14.5 12 14.5Z" fill="var(--text-dark)"/>
+                        <path d="M17 11.5C17 14.26 14.76 16.5 12 16.5C9.24 16.5 7 14.26 7 11.5H5C5 15.03 7.61 17.93 11 18.42V21.5H13V18.42C16.39 17.93 19 15.03 19 11.5H17Z" fill="var(--text-dark)"/>
+                    </svg>
+                </button>
+                <a href="{% url 'product_list' %}" class="marketplace-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-shop-window" viewBox="0 0 16 16">
+                        <path d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.37 2.37 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0M1.5 8.5A.5.5 0 0 1 2 9v6h12V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5m2 .5a.5.5 0 0 1 .5.5V13h8V9.5a.5.5 0 0 1 1 0V13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a.5.5 0 0 1 .5-.5"/>
+                    </svg>
                     
-                    </a>
-                </span>
+                </a>
+
                 <a href="">
                     <button class="profile-button">
                         <div class="profile-button__border"></div>
@@ -134,8 +202,153 @@
             </section>
         </section>
     </main>
-
+<!-- Voice Recognition Animation -->
+<!-- Voice Recognition Animation -->
+<div id="voice-recognition-animation" class="voice-recognition-animation">
+    <div class="voice-recognition-bar"></div>
+    <div class="voice-recognition-bar"></div>
+    <div class="voice-recognition-bar"></div>
+</div>
 </body>
+<script>
+    // Check if the browser supports the Web Speech API
+    if ('webkitSpeechRecognition' in window) {
+        let recognition = new webkitSpeechRecognition();
+        recognition.continuous = true; // Keep listening after a command
+        recognition.interimResults = false; // Only final results
+        recognition.lang = 'en-US'; // Set language
+
+        let isListeningForWakeWord = true; // Initially listening for "Pic" or "Hey Pic"
+        let isVoiceRecognitionActive = false; // Track if recognition is active
+
+        // Get the animation element
+        const voiceRecognitionAnimation = document.getElementById('voice-recognition-animation');
+
+        // Function to start voice recognition
+        function startVoiceRecognition() {
+            recognition.start();
+            isVoiceRecognitionActive = true;
+            console.log('Listening for commands...');
+            speak('Say "Pic" or "Hey Pic" to start voice recognition.');
+
+            // Show the animation
+            voiceRecognitionAnimation.style.display = 'flex';
+        }
+
+        // Function to stop voice recognition
+        function stopVoiceRecognition() {
+            recognition.stop();
+            isVoiceRecognitionActive = false;
+            console.log('Stopped listening.');
+            speak('Voice recognition stopped.');
+
+            // Hide the animation
+            voiceRecognitionAnimation.style.display = 'none';
+        }
+
+        // Function to speak feedback to the user
+        function speak(text) {
+            let msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'en-US';
+            window.speechSynthesis.speak(msg);
+        }
+
+        // Handle recognition results
+        recognition.onresult = function (event) {
+            let transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+            console.log('You said: ', transcript);
+
+            if (isListeningForWakeWord) {
+                // Check if the user said "Pic" or "Hey Pic"
+                if (transcript.includes('pic') || transcript.includes('hey pic')) {
+                    isListeningForWakeWord = false; // Now listen for commands
+                    speak('How can I help you?');
+                }
+            } else {
+                // Process the command
+                handleVoiceCommand(transcript);
+            }
+        };
+
+        // Handle errors
+        recognition.onerror = function (event) {
+            console.log('Error occurred in recognition: ' + event.error);
+            if (event.error === 'no-speech' || event.error === 'audio-capture') {
+                // Restart recognition if there's no speech or audio capture error
+                if (isVoiceRecognitionActive) {
+                    startVoiceRecognition();
+                }
+            }
+        };
+
+        // Handle when recognition ends
+        recognition.onend = function () {
+            console.log('Voice recognition ended.');
+            if (isVoiceRecognitionActive) {
+                // Restart recognition if it was active
+                startVoiceRecognition();
+            }
+        };
+
+        // Map voice commands to actions
+        function handleVoiceCommand(command) {
+            if (command.includes('pic stop') || command.includes('hey pic stop')) {
+                speak('Stopping voice recognition.');
+                stopVoiceRecognition();
+                isListeningForWakeWord = true; // Reset to listen for wake word
+            } else if (command.includes('home')) {
+                speak('Navigating to home');
+                window.location.href = "{% url 'index' %}";
+            } else if (command.includes('new post')) {
+                speak('Navigating to new post');
+                window.location.href = "{% url 'newpost' %}";
+            } else if (command.includes('profile')) {
+                speak('Navigating to profile');
+                window.location.href = "{% url 'profile' request.user %}";
+            } else if (command.includes('messages')) {
+                speak('Navigating to messages');
+                window.location.href = "{% url 'message' %}";
+            } else if (command.includes('notifications')) {
+                speak('Navigating to notifications');
+                window.location.href = "{% url 'show-notification' %}";
+            } else if (command.includes('reels')) {
+                speak('Navigating to reels');
+                window.location.href = "{% url 'reels-feed' %}";
+            } else if (command.includes('search')) {
+                // Extract the username from the command
+                let searchQuery = command
+                    .replace(/hey pic|pic|search|for|user/gi, '') // Remove unnecessary words
+                    .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '') // Remove punctuation
+                    .trim(); // Trim whitespace
+                if (searchQuery) {
+                    speak('Searching for ' + searchQuery);
+                    window.location.href = "{% url 'search-users' %}?q=" + encodeURIComponent(searchQuery);
+                } else {
+                    speak('Please specify a username to search for.');
+                }
+            } else {
+                speak('Sorry, I did not understand that command.');
+                console.log('Command not recognized: ', command);
+            }
+        }
+
+        // Toggle voice recognition on button click
+        document.getElementById('mic-button').addEventListener('click', function () {
+            if (isVoiceRecognitionActive) {
+                // Stop voice recognition if it's active
+                stopVoiceRecognition();
+                isListeningForWakeWord = true; // Reset to listen for wake word
+            } else {
+                // Start listening for the wake word
+                isListeningForWakeWord = true;
+                startVoiceRecognition();
+            }
+        });
+    } else {
+        console.log('Web Speech API is not supported in this browser.');
+    }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 </html>

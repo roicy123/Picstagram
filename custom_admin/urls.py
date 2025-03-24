@@ -44,4 +44,7 @@ urlpatterns = [
     path('reels/add/', views.reel_add, name='reel_add'),
     path('reels/edit/<int:pk>/', views.reel_edit, name='reel_edit'),
     path('reels/delete/<int:pk>/', views.reel_delete, name='reel_delete'),
+    
+    # Logout URL
+    path('logout/', views.custom_admin_logout, name='custom_admin_logout'),
 ]

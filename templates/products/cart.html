@@ -1,0 +1,566 @@
+{% extends 'products/base.html' %}
+
+{% block title %}Marketplace - Shopping Cart{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <div class="cart-header">
+        <h1 class="cart-title"><i class="fas fa-shopping-cart"></i> Your Shopping Cart</h1>
+        <div class="cart-summary">
+            {% if cart_items %}
+                <span class="cart-count">{{ cart_items|length }} item{% if cart_items|length != 1 %}s{% endif %}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if cart_items %}
+        <div class="cart-content">
+            <div class="cart-items">
+                <div class="cart-item-header">
+                    <div class="cart-col product-col">Product</div>
+                    <div class="cart-col price-col">Price</div>
+                    <div class="cart-col total-col">Total</div>
+                    <div class="cart-col action-col"></div>
+                </div>
+
+                {% for item in cart_items %}
+                    <div class="cart-item">
+                        <div class="cart-col product-col">
+                            <div class="product-info">
+                                <div class="product-image">
+                                    {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                    {% else %}
+                                        <div class="image-placeholder">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="product-details">
+                                    <h3 class="product-name">{{ item.product.name }}</h3>
+                                    <p class="product-meta">
+                                        {% if item.product.category %}
+                                            <span class="product-category">{{ item.product.category }}</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cart-col price-col">
+                            <span class="product-price">${{ item.product.price|floatformat:2 }}</span>
+                        </div>
+                        <div class="cart-col total-col">
+                            <span class="item-price">${{ item.product.price|floatformat:2}}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="cart-sidebar">
+                    <div class="checkout-actions">
+                        <a href="{% url 'checkout' %}" class="checkout-btn">
+                            <i class="fas fa-lock me-2"></i> Proceed to Checkout
+                        </a>
+                        <a href="{% url 'product_list' %}" class="continue-shopping">
+                            <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                        </a>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <h4>We Accept</h4>
+                    <div class="payment-icons">
+                        <i class="fab fa-cc-visa"></i>
+                        <i class="fab fa-cc-mastercard"></i>
+                        <i class="fab fa-cc-amex"></i>
+                        <i class="fab fa-cc-paypal"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            <div class="empty-cart-content">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h2>Your Cart is Empty</h2>
+                <p>Looks like you haven't added any items to your cart yet.</p>
+                <a href="{% url 'product_list' %}" class="btn-primary">
+                    <i class="fas fa-store me-2"></i> Browse Products
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Cart Page Styling */
+    .cart-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .cart-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .cart-title i {
+        color: #4a6bff;
+        margin-right: 0.5rem;
+    }
+
+    .cart-count {
+        font-size: 1rem;
+        color: #6c757d;
+        background-color: #f8f9fa;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+    }
+
+    .cart-content {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 2rem;
+    }
+
+    .cart-items {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .cart-item-header {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1.5fr 1fr 0.5fr;
+        padding: 1rem 1.5rem;
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .cart-item {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1.5fr 1fr 0.5fr;
+        padding: 1.5rem;
+        border-bottom: 1px solid #eaeaea;
+        align-items: center;
+        transition: background-color 0.2s;
+    }
+
+    .cart-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+    .product-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .product-image {
+        width: 80px;
+        height: 80px;
+        margin-right: 1rem;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        border: 1px solid #eaeaea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-size: 1.5rem;
+    }
+
+    .product-details {
+        flex: 1;
+    }
+
+    .product-name {
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 0 0 0.25rem 0;
+        color: #212529;
+    }
+
+    .product-meta {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .product-category {
+        display: inline-block;
+        padding: 0.2rem 0.5rem;
+        background-color: #f0f4ff;
+        color: #4a6bff;
+        border-radius: 4px;
+        font-size: 0.75rem;
+    }
+
+    .product-price {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+    }
+
+    .quantity-form {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .quantity-btn {
+        border: none;
+        background-color: #f8f9fa;
+        color: #495057;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .quantity-btn:hover {
+        background-color: #e9ecef;
+    }
+
+    .quantity-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .quantity-input {
+        width: 40px;
+        height: 32px;
+        text-align: center;
+        border: none;
+        border-left: 1px solid #ced4da;
+        border-right: 1px solid #ced4da;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .item-total {
+        font-weight: 700;
+        color: #212529;
+    }
+
+    .remove-btn {
+        border: none;
+        background-color: transparent;
+        color: #dc3545;
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .remove-btn:hover {
+        background-color: #ffebee;
+    }
+
+    /* Sidebar Styling */
+    .cart-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .cart-summary-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        padding: 1.5rem;
+    }
+
+    .summary-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 1.5rem 0;
+        color: #2c3e50;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .summary-items {
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        color: #495057;
+    }
+
+    .summary-row.discount {
+        color: #28a745;
+    }
+
+    .summary-row.tax {
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 1.125rem;
+        margin: 1rem 0;
+        color: #212529;
+    }
+
+    .promo-code {
+        margin: 1.5rem 0;
+    }
+
+    .promo-input {
+        display: flex;
+    }
+
+    .promo-input input {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 4px 0 0 4px;
+        font-size: 0.875rem;
+    }
+
+    .promo-btn {
+        padding: 0.5rem 1rem;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: background-color 0.2s;
+    }
+
+    .promo-btn:hover {
+        background-color: #5a6268;
+    }
+
+    .checkout-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .checkout-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        background-color: #4a6bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .checkout-btn:hover {
+        background-color: #3a5bef;
+        transform: translateY(-2px);
+    }
+
+    .continue-shopping {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.2s;
+    }
+
+    .continue-shopping:hover {
+        color: #4a6bff;
+    }
+
+    .payment-methods {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        padding: 1.5rem;
+    }
+
+    .payment-methods h4 {
+        font-size: 1rem;
+        margin: 0 0 1rem 0;
+        color: #495057;
+    }
+
+    .payment-icons {
+        display: flex;
+        gap: 1rem;
+        color: #6c757d;
+        font-size: 1.75rem;
+    }
+
+    /* Empty Cart Styling */
+    .empty-cart {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+    }
+
+    .empty-cart-content {
+        text-align: center;
+        max-width: 400px;
+    }
+
+    .empty-cart-icon {
+        font-size: 4rem;
+        color: #ced4da;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-cart h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+
+    .empty-cart p {
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background-color: #4a6bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: #3a5bef;
+        transform: translateY(-2px);
+    }
+
+    .me-2 {
+        margin-right: 0.5rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .cart-content {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-sidebar {
+            order: -1;
+            margin-bottom: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .cart-item-header {
+            display: none;
+        }
+
+        .cart-item {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .cart-col {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-col:before {
+            content: attr(data-label);
+            font-weight: 600;
+        }
+
+        .product-col:before {
+            content: none;
+        }
+
+        .action-col {
+            justify-content: flex-end;
+        }
+    }
+</style>
+
+<script>
+    // Add data-label attributes to cart columns for mobile view
+    document.addEventListener('DOMContentLoaded', function() {
+        const priceColumns = document.querySelectorAll('.price-col');
+        const quantityColumns = document.querySelectorAll('.quantity-col');
+        const totalColumns = document.querySelectorAll('.total-col');
+        
+        priceColumns.forEach(col => {
+            col.setAttribute('data-label', 'Price');
+        });
+        
+        quantityColumns.forEach(col => {
+            col.setAttribute('data-label', 'Quantity');
+        });
+        
+        totalColumns.forEach(col => {
+            col.setAttribute('data-label', 'Total');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends 'products/base.html' %}
+
+{% block title %}Marketplace - Product Details{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="product-header">
+        <h1 class="product-title">{{ product.name }}</h1>
+    </div>
+
+    <div class="product-content">
+        <div class="product-image">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="product-details">
+            <div class="product-description">
+                <h3>Description</h3>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <div class="product-pricing">
+                <div class="price-section">
+                    <span class="price-label">Price:</span>
+                    <span class="price-value">${{ product.price|floatformat:2 }}</span>
+                </div>
+
+                    <div class="stock-status in-stock">
+                        <i class="fas fa-check-circle"></i> In Stock
+                    </div>
+            </div>
+
+            <div class="product-actions">
+                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary add-to-cart-btn">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </a>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary back-to-products">
+                    <i class="fas fa-arrow-left"></i> Back to Products
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    .product-header {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #eaeaea;
+        padding-bottom: 1rem;
+    }
+
+    .product-title {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .product-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .product-image {
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-placeholder {
+        font-size: 4rem;
+        color: #adb5bd;
+    }
+
+    .product-details {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .product-description h3 {
+        color: #495057;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #eaeaea;
+        padding-bottom: 0.5rem;
+    }
+
+    .product-description p {
+        color: #6c757d;
+        line-height: 1.6;
+    }
+
+    .product-pricing {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .price-label {
+        font-weight: 600;
+        color: #495057;
+        margin-right: 0.5rem;
+    }
+
+    .price-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #4a6bff;
+    }
+
+    .stock-status {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+    }
+
+    .stock-status i {
+        margin-right: 0.5rem;
+    }
+
+    .in-stock {
+        color: #28a745;
+    }
+
+    .out-of-stock {
+        color: #dc3545;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #4a6bff;
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #3a5bef;
+    }
+
+    .btn-secondary {
+        background-color: #f8f9fa;
+        color: #495057;
+        border: 1px solid #ced4da;
+    }
+
+    .btn-secondary:hover {
+        background-color: #e9ecef;
+    }
+
+    .btn i {
+        margin-right: 0.5rem;
+    }
+
+    .btn.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+        .product-content {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

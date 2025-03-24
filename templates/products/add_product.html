@@ -1,0 +1,264 @@
+{% extends 'products/base.html' %}
+
+{% block title %}Marketplace - Add Product{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-gradient-primary text-white text-center py-4 rounded-top">
+                    <h1 class="h2 fw-bold mb-2">Add New Product</h1>
+                    <p class="mb-0 opacity-75">Complete the form below to add your product to the marketplace</p>
+                </div>
+                <div class="card-body p-4 p-lg-5">
+                    <form method="POST" enctype="multipart/form-data" id="productForm">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-7">
+                                {% for field in form %}
+                                    <div class="mb-4 form-group">
+                                        <label for="{{ field.id_for_label }}" class="form-label fw-semibold text-dark mb-2">
+                                            {{ field.label }}
+                                            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                        </label>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                            <div class="form-text text-muted small mt-1">
+                                                <i class="fas fa-info-circle me-1"></i>{{ field.help_text }}
+                                            </div>
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            <div class="text-danger small mt-1">
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Image Preview Column -->
+                            <div class="col-md-5">
+                                <div class="image-preview-container text-center p-3 mb-3 border rounded bg-light">
+                                    <h5 class="mb-3 text-secondary"><i class="fas fa-image me-2"></i>Product Image</h5>
+                                    <div class="image-upload-area mb-3" id="uploadArea">
+                                        <img id="imagePreview" class="img-fluid d-none shadow-sm rounded mb-3" style="max-height: 220px;" />
+                                        <div id="placeholderText" class="py-5 text-muted">
+                                            <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                            <p>Preview will appear here</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="changeImageBtn" class="btn btn-sm btn-outline-secondary d-none">
+                                        <i class="fas fa-sync-alt me-1"></i>Change Image
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex flex-column flex-md-row gap-3 mt-4 justify-content-between">
+                            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Products
+                            </a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 submit-btn">
+                                <i class="fas fa-plus-circle me-2"></i>Add Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tips Section -->
+            <div class="card mt-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-lightbulb me-2"></i>Product Tips</h5>
+                    <ul class="mb-0 ps-3">
+                        <li class="mb-2">Use high-quality images for better visibility</li>
+                        <li class="mb-2">Be specific with your product description</li>
+                        <li>Include important details like dimensions, materials, etc.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Image Preview -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const imageInput = document.querySelector("input[type='file']");
+        const imagePreview = document.getElementById("imagePreview");
+        const placeholderText = document.getElementById("placeholderText");
+        const changeImageBtn = document.getElementById("changeImageBtn");
+        const uploadArea = document.getElementById("uploadArea");
+        
+        if (imageInput) {
+            // Add styling to file input
+            imageInput.classList.add("form-control");
+            
+            // Handle image preview
+            imageInput.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.classList.remove("d-none");
+                        placeholderText.classList.add("d-none");
+                        changeImageBtn.classList.remove("d-none");
+                        
+                        // Add active class to upload area
+                        uploadArea.classList.add("has-image");
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Change image button functionality
+            changeImageBtn.addEventListener("click", function() {
+                imageInput.click();
+            });
+            
+            // Make upload area clickable
+            uploadArea.addEventListener("click", function() {
+                if (!uploadArea.classList.contains("has-image")) {
+                    imageInput.click();
+                }
+            });
+        }
+        
+        // Form validation feedback
+        const form = document.getElementById("productForm");
+        form.addEventListener("submit", function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Add animation to invalid fields
+                const invalidFields = form.querySelectorAll(":invalid");
+                invalidFields.forEach(field => {
+                    field.classList.add("shake-animation");
+                    setTimeout(() => {
+                        field.classList.remove("shake-animation");
+                    }, 800);
+                });
+            }
+            
+            form.classList.add("was-validated");
+        });
+    });
+</script>
+
+<!-- Custom CSS -->
+<style>
+    /* Gradient header */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #4a6bff 0%, #aaabaf 100%);
+        border: none;
+    }
+    
+    /* Form styling */
+    .form-control, .form-select {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #4a6bff;
+        box-shadow: 0 0 0 0.25rem rgba(74, 107, 255, 0.25);
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+    }
+    
+    /* Image upload area styling */
+    .image-upload-area {
+        border: 2px dashed #ced4da;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+    
+    .image-upload-area:hover {
+        border-color: #4a6bff;
+        background-color: #f0f4ff;
+    }
+    
+    .image-upload-area.has-image {
+        border-style: solid;
+        border-color: #4a6bff;
+        background-color: white;
+    }
+    
+    /* Button styling */
+    .btn-primary {
+        background-color: #4a6bff;
+        border-color: #4a6bff;
+        box-shadow: 0 2px 6px rgba(74, 107, 255, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #3a5bef;
+        border-color: #3a5bef;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(74, 107, 255, 0.5);
+    }
+    
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Validation animation */
+    .shake-animation {
+        animation: shake 0.5s linear;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-5px); }
+        40%, 80% { transform: translateX(5px); }
+    }
+    
+    /* Loading state for submit button */
+    .submit-btn.loading {
+        pointer-events: none;
+        position: relative;
+        color: transparent;
+    }
+    
+    .submit-btn.loading::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-top: -0.75rem;
+        margin-left: -0.75rem;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-top-color: white;
+        animation: spin 1s infinite linear;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}

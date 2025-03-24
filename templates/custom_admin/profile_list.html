@@ -1,14 +1,51 @@
 {% extends 'custom_admin/base.html' %}
 {% block content %}
-    <h2>All Profiles</h2>
-    <a href="{% url 'profile_create' %}">Add New Profile</a>
-    <ul>
-        {% for profile in profiles %}
-            <li>
-                <a href="{% url 'profile_detail' profile.pk %}">{{ profile.user.username }}</a> 
-                <a href="{% url 'profile_update' profile.pk %}">Edit</a> 
-                <a href="{% url 'profile_delete' profile.pk %}">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">All Profiles</h2>
+    <a href="{% url 'profile_create' %}" class="btn btn-primary">
+      <i class="fas fa-plus-circle me-2"></i>Add New Profile
+    </a>
+  </div>
+  
+  {% if profiles %}
+    <div class="card shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Username</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for profile in profiles %}
+            <tr>
+              <td>
+                <a href="{% url 'profile_detail' profile.pk %}" class="text-decoration-none fw-bold">
+                  {{ profile.user.username }}
+                </a>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a href="{% url 'profile_update' profile.pk %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i>Edit
+                  </a>
+                  <a href="{% url 'profile_delete' profile.pk %}" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-trash-alt me-1"></i>Delete
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>No profiles found. Click "Add New Profile" to create one.
+    </div>
+  {% endif %}
+</div>
 {% endblock %}

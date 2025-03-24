@@ -21,6 +21,8 @@ from django.conf.urls.static import static
 # from elements import views as e_views
 # from authusers import views as auth_views
 from authy.views import UserProfile, follow
+from marketplace import views as marketplace
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,7 +35,10 @@ urlpatterns = [
     path('custom-admin/', include('custom_admin.urls')),
     path('/chatbot', include('chatbot.urls')),
     path('stories/', include('stories.urls')),
-    path('content_analyzer/', include('content_analyzer.urls')),
+    path('marketplace/', include('marketplace.urls')),
+    path('password/', include('password.urls')),
+
+    path('payment-success/', marketplace.payment_success, name='payment_success'),
 
     # profile
     path('<username>/', UserProfile, name='profile'),

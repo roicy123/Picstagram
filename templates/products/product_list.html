@@ -1,0 +1,635 @@
+{% extends 'products/base.html' %}
+
+{% block title %}Marketplace - Textwave{% endblock %}
+
+{% block content %}
+<div class="marketplace-container">
+    <div class="marketplace-header">
+        <h1 class="marketplace-title"><i class="fas fa-store"></i> Product Marketplace</h1>
+        <div class="marketplace-actions">
+            <a href="{% url 'cart_view' %}" class="cart-button">
+                <i class="fas fa-shopping-cart"></i> View Cart
+                {% if cart_count %}
+                    <span class="cart-badge">{{ cart_count }}</span>
+                {% endif %}
+            </a>
+        </div>
+    </div>
+
+    <div class="category-filter">
+        <div class="filter-label">Browse Categories:</div>
+        <div class="filter-options">
+            <a href="{% url 'product_list' %}" class="filter-option {% if not category %}active{% endif %}">All</a>
+            {% for cat in categories %}
+                <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="filter-option {% if category == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if products %}
+        <div class="products-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    <div class="product-image">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="image-placeholder">
+                                <i class="fas fa-box"></i>
+                            </div>
+                        {% endif %}
+                        {% if product.is_new %}
+                            <span class="product-badge new">New</span>
+                        {% endif %}
+                        {% if product.is_sale %}
+                            <span class="product-badge sale">Sale</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-content">
+                        <h2 class="product-name">
+                            <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a>
+                        </h2>
+                        {% if product.category %}
+                            <span class="product-category">{{ product.category }}</span>
+                        {% endif %}
+                        <div class="product-meta">
+                            <div class="product-rating">
+                                {% for i in '12345'|make_list %}
+                                    {% if forloop.counter <= product.rating_average %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif forloop.counter <= product.rating_average|add:0.5 %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="rating-count">({{ product.rating_count }})</span>
+                            </div>
+                            <div class="stock in-stock">In Stock</div>
+                        </div>
+                        <div class="product-price-row">
+                            {% if product.old_price %}
+                                <span class="product-old-price">${{ product.old_price|floatformat:2 }}</span>
+                            {% endif %}
+                            <span class="product-price">${{ product.price|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <a href="{% url 'product_detail' product.id %}" class="view-details">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        <form method="post" action="{% url 'add_to_cart' product.id %}" class="add-to-cart-form">
+                            {% csrf_token %}
+                            <button type="submit" class="add-to-cart-btn" {% if product.stock == 0 %}disabled{% endif %}>
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if products.paginator.num_pages > 1 %}
+            <div class="pagination-container">
+                <div class="pagination">
+                    {% if products.has_previous %}
+                        <a href="?page=1{% if category %}&category={{ category }}{% endif %}" class="pagination-link first">
+                            <i class="fas fa-angle-double-left"></i> First
+                        </a>
+                        <a href="?page={{ products.previous_page_number }}{% if category %}&category={{ category }}{% endif %}" class="pagination-link prev">
+                            <i class="fas fa-angle-left"></i> Previous
+                        </a>
+                    {% else %}
+                        <span class="pagination-link disabled first">
+                            <i class="fas fa-angle-double-left"></i> First
+                        </span>
+                        <span class="pagination-link disabled prev">
+                            <i class="fas fa-angle-left"></i> Previous
+                        </span>
+                    {% endif %}
+                    
+                    <div class="pagination-pages">
+                        {% for num in products.paginator.page_range %}
+                            {% if num == products.number %}
+                                <span class="pagination-link active">{{ num }}</span>
+                            {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                                <a href="?page={{ num }}{% if category %}&category={{ category }}{% endif %}" class="pagination-link">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    
+                    {% if products.has_next %}
+                        <a href="?page={{ products.next_page_number }}{% if category %}&category={{ category }}{% endif %}" class="pagination-link next">
+                            Next <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page={{ products.paginator.num_pages }}{% if category %}&category={{ category }}{% endif %}" class="pagination-link last">
+                            Last <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="pagination-link disabled next">
+                            Next <i class="fas fa-angle-right"></i>
+                        </span>
+                        <span class="pagination-link disabled last">
+                            Last <i class="fas fa-angle-double-right"></i>
+                        </span>
+                    {% endif %}
+                </div>
+                
+                <div class="pagination-info">
+                    Showing page {{ products.number }} of {{ products.paginator.num_pages }} ({{ products.paginator.count }} total products)
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-products">
+            <div class="empty-products-content">
+                <div class="empty-products-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h2>No Products Found</h2>
+                <p>We couldn't find any products matching your criteria.</p>
+                <a href="{% url 'product_list' %}" class="btn-primary">
+                    <i class="fas fa-sync-alt me-2"></i> Clear Filters
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Marketplace Page Styling */
+    .marketplace-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .marketplace-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .marketplace-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .marketplace-title i {
+        color: #4a6bff;
+        margin-right: 0.5rem;
+    }
+
+    .marketplace-actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .cart-button {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background-color: #f8f9fa;
+        color: #495057;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.2s, color 0.2s;
+        position: relative;
+    }
+
+    .cart-button:hover {
+        background-color: #e9ecef;
+        color: #212529;
+    }
+
+    .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background-color: #4a6bff;
+        color: white;
+        font-size: 0.75rem;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Category Filter Styling */
+    .category-filter {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eaeaea;
+        flex-wrap: wrap;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: #495057;
+        margin-right: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .filter-option {
+        padding: 0.5rem 1rem;
+        background-color: #f8f9fa;
+        color: #495057;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+    .filter-option:hover {
+        background-color: #e9ecef;
+        color: #212529;
+    }
+
+    .filter-option.active {
+        background-color: #4a6bff;
+        color: white;
+    }
+
+    /* Products Grid Styling */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .product-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .product-image {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .product-card:hover .product-image img {
+        transform: scale(1.05);
+    }
+
+    .image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-size: 3rem;
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .product-badge.new {
+        background-color: #4a6bff;
+        color: white;
+    }
+
+    .product-badge.sale {
+        background-color: #ff4a6b;
+        color: white;
+    }
+
+    .product-content {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.4;
+    }
+
+    .product-name a {
+        color: #2c3e50;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .product-name a:hover {
+        color: #4a6bff;
+    }
+
+    .product-category {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background-color: #f0f4ff;
+        color: #4a6bff;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .product-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        color: #ffc107;
+        font-size: 0.875rem;
+    }
+
+    .rating-count {
+        color: #6c757d;
+        margin-left: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .stock {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+    }
+
+    .in-stock {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .out-of-stock {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+
+    .product-price-row {
+        display: flex;
+        align-items: center;
+        margin-top: auto;
+        padding-top: 1rem;
+    }
+
+    .product-old-price {
+        color: #6c757d;
+        font-size: 0.875rem;
+        text-decoration: line-through;
+        margin-right: 0.75rem;
+    }
+
+    .product-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .product-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    .view-details {
+        padding: 0.75rem;
+        text-align: center;
+        background-color: #f8f9fa;
+        color: #495057;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+    .view-details:hover {
+        background-color: #e9ecef;
+        color: #212529;
+    }
+
+    .add-to-cart-form {
+        width: 100%;
+    }
+
+    .add-to-cart-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #4a6bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .add-to-cart-btn:hover {
+        background-color: #3a5bef;
+    }
+
+    .add-to-cart-btn:disabled {
+        background-color: #ced4da;
+        cursor: not-allowed;
+    }
+
+    /* Pagination Styling */
+    .pagination-container {
+        margin-top: 3rem;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .pagination-link {
+        padding: 0.5rem 1rem;
+        background-color: #f8f9fa;
+        color: #495057;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: background-color 0.2s, color 0.2s;
+        display: flex;
+        align-items: center;
+    }
+
+    .pagination-link:hover {
+        background-color: #e9ecef;
+        color: #212529;
+    }
+
+    .pagination-link.active {
+        background-color: #4a6bff;
+        color: white;
+    }
+
+    .pagination-link.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .pagination-link.disabled:hover {
+        background-color: #f8f9fa;
+        color: #495057;
+    }
+
+    .pagination-pages {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .pagination-info {
+        text-align: center;
+        margin-top: 1rem;
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    /* Empty Products Styling */
+    .empty-products {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+    }
+
+    .empty-products-content {
+        text-align: center;
+        max-width: 400px;
+    }
+
+    .empty-products-icon {
+        font-size: 4rem;
+        color: #ced4da;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-products h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+
+    .empty-products p {
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background-color: #4a6bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: #3a5bef;
+        transform: translateY(-2px);
+    }
+
+    .me-2 {
+        margin-right: 0.5rem;
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 768px) {
+        .marketplace-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .product-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    // Add category highlighting
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle hover effects for product cards
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+            const img = card.querySelector('img');
+            if (img) {
+                img.addEventListener('error', function() {
+                    this.style.display = 'none';
+                    const placeholder = card.querySelector('.image-placeholder');
+                    if (placeholder) {
+                        placeholder.style.display = 'flex';
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -9,20 +9,126 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <script src="https://kit.fontawesome.com/fc1e235b2e.js"></script>
   <link rel="stylesheet" href="{% static 'assets2/style.css' %}">
-  <title>Instagram | Register</title>
+  <title>Picstagram | Register</title>
+  <style>
+/* Additional Styles for Picstagram Register Page */
+/* Additional Styles for Picstagram Register Page */
+
+/* Centering the form */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f9f9f9, #ececec);
+}
+
+/* Logo styling */
+h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Adding a subtle box shadow for better aesthetics */
+.form-data {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+  width: 350px;
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.form-data:hover {
+  transform: scale(1.02);
+}
+
+/* Styling the input fields */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #f8f8f8;
+  transition: border 0.3s ease-in-out;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border: 1px solid #0095f6;
+  outline: none;
+}
+
+/* Improving the submit button */
+.form-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #0095f6, #0077cc);
+  border: none;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.form-btn:hover {
+  background: linear-gradient(135deg, #0077cc, #005fa3);
+  transform: scale(1.05);
+}
+
+/* Adjusting the sign-up link */
+.sign-up {
+  margin-top: 15px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sign-up a {
+  color: #0095f6;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.sign-up a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 400px) {
+  .form-data {
+    width: 90%;
+    padding: 20px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+}
+
+  </style>
 </head>
 
 <body>
 
   <div id="wrapper">
     <div class="container">
-      <div class="phone-app-demo"></div>
       <div class="form-data">
+        <h2>Picstagram</h2>
         <form action="" method="POST">
           {% csrf_token %}
-          <div class="logo">
-            <img src="{% static 'assets2/images/logo.png' %}" alt="logo">
-          </div>
+
           <!-- <input type="text" placeholder="Phone number, username, or email"> -->
           <!-- <input type="password" placeholder="Password"> -->
           {{form.username}}
@@ -35,13 +141,6 @@
           <!-- <a href="index.html" class="form-btn" type="submit">Log in</a> -->
         <div class="sign-up">
           Don't have an account? <a href="{% url 'sign-in' %}">Sign In</a>
-        </div>
-        <div class="get-the-app">
-          <span>Get the app.</span>
-          <div class="badges">
-            <img src="{% static 'assets2/images/app-store.png' %}" alt="app-store badge">
-            <img src="{% static 'assets2/images/google-play.png' %}" alt="google-play badge">
-          </div>
         </div>
       </div>
     </div>
