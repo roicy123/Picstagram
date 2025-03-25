@@ -12,15 +12,18 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
-CONTENT_ANALYSIS_API_KEY = '995616783'
-CONTENT_ANALYSIS_API_SECRET = 'Pmcv5BcLdXgio3Jnuj3mvXTf9SHb2wuN'
+load_dotenv()
 
-
-STRIPE_SECRET_KEY = "sk_test_51R5i1vPX4E1uofQwB20eJIwnFx29VtWdJsOAq4q8XRcY8tZXJWZqjwvNt7KYhy8O25tWac54knnTVf7slkeVIeKA00BfmdecNr"
-STRIPE_PUBLIC_KEY = "pk_test_51R5i1vPX4E1uofQwx56gi8lqTkJ9i8bELgFBtbkD4fyV8GvYHmV1dXzosCO0d6h38EFBd3hnRYNswtN8DJz8SC4O002j0TgiVP"
+# Retrieve secret keys
+CONTENT_ANALYSIS_API_KEY = os.getenv("CONTENT_ANALYSIS_API_KEY")
+CONTENT_ANALYSIS_API_SECRET = os.getenv("CONTENT_ANALYSIS_API_SECRET")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
 
 
 
